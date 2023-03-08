@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>anonymous3858</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+	<meta property="og:title" content="2023anonymous3858">
+    <meta property="og:url" content="https://2023anonymous3858.github.io/">
+	<meta property="og:image" content="./image/iccv_main.png">
+	<meta name="description" content="2023anonymous3858">
+	<meta name="keywords" content="2023anonymous3858">
+	<meta name="author" content="....">
+    
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <link rel="stylesheet" href="./fontawesome.all.min.css">
+    <!-- <link rel="stylesheet" href="./bulma.min.css"> -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+    <script src="https://kit.fontawesome.com/d4c0a5ef49.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+</head>
+<body>
+<div class="title">
+    <h1>TITLE</h1>
+    <center>
+    <h3>anonymous3858</h3>
+    <center>
+</div>
+<!-- <div class="byline">
+    <center>
+    <span class="link-block">
+        <a href="https://arxiv.org/pdf/2211.08761.pdf"
+           class="external-link button is-normal is-rounded is-dark">
+          <span class="icon">
+              <i class="fas fa-file-pdf"></i>
+          </span>
+          <span>Paper</span>
+        </a>
+      </span>
+      <span class="link-block">
+        <a href="https://arxiv.org/abs/2211.08761"
+           class="external-link button is-normal is-rounded is-dark">
+          <span class="icon">
+              <i class="ai ai-arxiv"></i>
+          </span>
+          <span>arXiv</span>
+        </a>
+      </span>
+    <span class="link-block">
+        <a href="https://github.com/stnamjef/SPINN"
+           class="external-link button is-normal is-rounded is-dark">
+          <span class="icon">
+              <i class="fab fa-github"></i>
+          </span>
+          <span>Code</span>
+          </a>
+      </span>
+    </center>
+
+    
+</div> -->
+
+
+<div class="container">
+    <div class="sections-container">
+        <!-- <div class="center-img">
+            <img class="content" src="./image/iccv_figure1.png">
+        </div> -->
+    
+</div>
+
+    <div class="sections-container">
+        <div class="section">
+            <h2 class="section-title">Abstract</h2>
+            <p>
+                Current LiDAR-based 3D Object Detection methods often fail to generalize to unseen data distribution due to various domain shift issues. 
+                Especially, they are  insufficient for robust Unsupervised Domain Adaptation (UDA) across datasets with varying laser density. 
+                In addition, we empirically observe that under subdomain shift, the network's understanding is often limited and does not adapt sufficiently.
+                To tackle these issues, we advocate leveraging multi-view images with rich-semantic information and adversarially self-training to bridge the domain gap.
+                Our proposed framework consists of two main processes: (1) Cross-Modality Knowledge Interaction and (2) Cross-Domain Adversarial Network. 
+                The former carefully self-supervise the point features with high-context image features in the BEV, an optimal joint space between the image and the point. 
+                The latter approach explicitly guides the source and target domains, thereby alleviating the representational gap.
+                To validate the effectiveness and generalizability of the proposed method with prominent 3D object detection datasets: nuScenes, Waymo, and KITTI. We also demonstrate that our novel method outperforms current state-of-the-art models on UDA for 3D Object Detection.
+            </p>
+        </div>
+        <div class="section">
+            <h2 class="section-title">Method</h2>
+
+            <h2 class="section-subtitle">Overview</h2>
+            <div class="center-img">
+                <img class="content" src="./image/iccv_main.png"/>
+            </div>
+            <p style="margin-top: 30px;">
+                An overview of our main architecture. Our model is trained through two distinct stages, namely (a) LiDAR Encoder pretraining and (b) Self-Training, each with separate data pipelines. 
+                During (a), the image and LiDAR pipelines are streamed, whereas in (b), a mixed point pipeline is streamed. 
+                Furthermore, the proposed models are independently toggled during each training stage, with CMKI activated in (a) and CDAN in (b). 
+                Overall, our model takes point clouds $P$ and outputs a set of 3D bounding boxes $\hat{Y}$ for objects in the test time. 
+            </p>
+
+        </br>
+
+        <h2 class="section-subtitle">Self-Training</h2>
+        <div class="center-img">
+                <img class="content" src="./image/iccv_figure4.png"/>
+            </div>
+            <p style="margin-top: 30px;">
+                An illustration of our Self-Training step with CDAN.Our novel framework adversarially pilots the network to restrict learning domain-invariant information. 
+                Precisely, we fool the discriminator $\phi_D$ to minimize the representational gap between the source and target instance-level features $\textbf{f}_i$, as showed in the Adversarial Training block above.
+            </p>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Experiment Results</h2>
+
+            <div class="center-img">
+                <img class="content" src="./image/iccv_table.png" >
+            </div>
+        <p style="margin-top: 30px;">
+            <center>
+                Unsupervised Domain Adaptation performance in LiDAR-only 3D Object Detection. 
+                Our model and baselines report moderate $\text{BEV~AP}$ and $\text{3D~AP}$ of the car category at $\text{IoU = 0.7}$.
+                We also evaluate on $\text{Closed GAP}$ with $\text{APs}$ of target and source. L.D. stands for LiDAR Distillation. 
+                Note that we highlight the best in bold for visibility.
+            </center>
+        </p>
+            <!-- <div class="grid-image">
+                <img alt="" src="" />
+                <img alt="" src="" />
+            </div>
+        <p style="margin-top: 30px;">
+            <center>
+                -
+            </center>
+        </p> -->
+        <div class="center-img">
+            <img class="content" src="./image/iccv_tsne.png" >
+        </div>
+
+        <p style="margin-top: 30px;">
+            <center>
+                t-SNE visualization of source (red) and target (blue) domains' features. 
+                S and T stand for source and target, respectively. 
+                We discover that our Cross-Domain Discriminator suitably overcomes the domain shift effect between two domains. 
+                Best viewed in color.
+            </center>
+        </p>
+</div>
+</body>
+<script>
+
+    
+
+</script>
+</html>
