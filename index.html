@@ -30,9 +30,11 @@
 </head>
 <body>
 <div class="title">
-    <h1>TITLE</h1>
     <center>
-    <h3>anonymous3858</h3>
+    <h2>Higher-order Relation Reasoning for Trajectory Prediction</h2>
+    </center>
+    <center>
+    <h3>Anonymous 6751</h3>
     <center>
 </div>
 <!-- <div class="byline">
@@ -81,56 +83,85 @@
     <div class="sections-container">
         <div class="section">
             <h2 class="section-title">Abstract</h2>
+            <center>
+            <img class="content" src="./image/hg1-1.png" height="200" width="480" />
+            </center>
             <p>
-                Current LiDAR-based 3D Object Detection methods often fail to generalize to unseen data distribution due to various domain shift issues. 
-                Especially, they are  insufficient for robust Unsupervised Domain Adaptation (UDA) across datasets with varying laser density. 
-                In addition, we empirically observe that under subdomain shift, the network's understanding is often limited and does not adapt sufficiently.
-                To tackle these issues, we advocate leveraging multi-view images with rich-semantic information and adversarially self-training to bridge the domain gap.
-                Our proposed framework consists of two main processes: (1) Cross-Modality Knowledge Interaction and (2) Cross-Domain Adversarial Network. 
-                The former carefully self-supervise the point features with high-context image features in the BEV, an optimal joint space between the image and the point. 
-                The latter approach explicitly guides the source and target domains, thereby alleviating the representational gap.
-                To validate the effectiveness and generalizability of the proposed method with prominent 3D object detection datasets: nuScenes, Waymo, and KITTI. We also demonstrate that our novel method outperforms current state-of-the-art models on UDA for 3D Object Detection.
+                Social relations have substantial impacts on the potential trajectories of each individual.
+                Modeling these dynamics has been a central solution for more precise and accurate trajectory forecasting.
+                However, previous works ignore the importance of 'social depth', meaning the influences flowing from different degrees of social relations.
+                In this work, we propose HighGraph, a graph-based relational reasoning method that captures the higher-order dynamics of social interactions.
+                First, we construct a collision-aware relation graph based on the agents' observed trajectories.
+                Upon this graph structure, we build our core module that aggregates the agent features from diverse social distances.
+                As a result, the network is able to model more complex relations, thereby yielding more accurate and socially acceptable trajectories.
+                Our HighGraph is a plug-and-play module that can be easily applied to any current trajectory predictors.
+                Extensive experiments with ETH/UCY and SDD datasets demonstrate that our HighGraph noticeably improves the previous state-of-the-art baselines both quantitatively and qualitatively. 
             </p>
         </div>
         <div class="section">
             <h2 class="section-title">Method</h2>
 
-            <h2 class="section-subtitle">Overview</h2>
+            <h2 class="section-subtitle">Overall Architecture</h2>
             <div class="center-img">
-                <img class="content" src="./image/iccv_main.png"/>
+                <img class="content" src="./image/mainfigure-1.png"/>
             </div>
             <p style="margin-top: 30px;">
-                An overview of our main architecture. Our model is trained through two distinct stages, namely (a) LiDAR Encoder pretraining and (b) Self-Training, each with separate data pipelines. 
-                During (a), the image and LiDAR pipelines are streamed, whereas in (b), a mixed point pipeline is streamed. 
-                Furthermore, the proposed models are independently toggled during each training stage, with CMKI activated in (a) and CDAN in (b). 
-                Overall, our model takes point clouds $P$ and outputs a set of 3D bounding boxes $\hat{Y}$ for objects in the test time. 
+                The higher-order relation reasoning architecture of HighGraph.
+                First, we define the social interactions with the proposed collision-aware kernel function. 
+                Then HighGraph recursively aggregates the social features from diverse distances and combines them to obtain complex social influences. 
+                These fruitful feature embeddings can be used in any existing trajectory network. Best viewed in color. 
             </p>
 
         </br>
 
-        <h2 class="section-subtitle">Self-Training</h2>
+        <h2 class="section-subtitle">Collision-aware Kernel Function</h2>
         <div class="center-img">
-                <img class="content" src="./image/iccv_figure4.png"/>
+                <img class="content" src="./image/collisionfig-1.png" height="350" width="480" />
             </div>
             <p style="margin-top: 30px;">
-                An illustration of our Self-Training step with CDAN.Our novel framework adversarially pilots the network to restrict learning domain-invariant information. 
-                Precisely, we fool the discriminator $\phi_D$ to minimize the representational gap between the source and target instance-level features $\textbf{f}_i$, as showed in the Adversarial Training block above.
+                Visualization of social interaction modeling of our collision-aware kernel function. 
+                Case (a) and (b) describe the situation where two agents are expected to collide at a certain point. 
+                We assign weight values based on the distance between the potential collision point to each agent and the distance between each other. 
+                Case (c) is an example where no collision is expected. We assign $0$ for the kernel weight in such a case. Best viewed in color.
             </p>
         </div>
+
+        <h2 class="section-subtitle">Higher-order Graph Convolutions</h2>
+        <p style="margin-top: 30px;">
+            Powering the adjacency matrix opens up the path to the nodes in distant hops. 
+            HighGraph leverages this concept to model the higher-order social influences between individuals. 
+            We first make $M$ adjacency matrix for each layer, each of which represents the $m^{th}$-powers of our collision-aware $\hat{A}$ from 
+            the previous section, where $m\in\{1,...,M\}$. 
+            Multiplying each of them with the agent social feature $\mathbf{X}$ computes the $m^{th}$-order social influences between the agents:
+            \begin{equation}
+                \mathbf{H}^{(l)}_{m}=\mathbf{\hat{A}}^{m}\mathbf{X}^{(l)}\mathbf{W}^{(l)}_{m},
+            \end{equation}
+            where $l$ is a layer number and $\mathbf{W}^{(l)}_{m}$ is a trainable weight matrix that learns the $m^{th}$-order social relations in layer $l$.
+            </br></br>
+            Now we devise a combination layer that distills influential social interactions from various distances 
+            and integrates them as one representative vector. First, our combination layer concatenates the $M$ higher-order features. 
+            Then it passes the mixture function $\mathcal{F}$, where we utilize multi-layer perceptrons~(MLPs) with a non-linear activation function. 
+            The described combination layer can be formulated as follows:
+            \begin{equation}
+                \mathbf{X}^{(l+1)}=\mathcal{F}(\lambda_{1}\mathbf{H}^{(l)}_{1}\mathbin\Vert \lambda_{2}\mathbf{H}^{(l)}_{2}\mathbin\Vert ...\mathbin\Vert \lambda_{M}\mathbf{H}^{(l)}_{M}),
+            \end{equation}
+            where $\lambda_{m}$ denotes the trainable weight for the $m^{th}$-order feature. 
+            By letting $\sum_{m\in\{1,...,M\}}\lambda_{m}=1$, the model discriminates the social influences from different degrees. 
+            We repeatedly stack the explained HighGraph layers in order and obtain the higher-order relation embeddings.
+        </p>
         
         <div class="section">
             <h2 class="section-title">Experiment Results</h2>
-
+            <h2 class="section-subtitle">Quantitative Analysis</h2>
             <div class="center-img">
-                <img class="content" src="./image/iccv_table.png" >
+                <img class="content" src="./image/maintable.png" >
             </div>
         <p style="margin-top: 30px;">
-            <center>
-                Unsupervised Domain Adaptation performance in LiDAR-only 3D Object Detection. 
-                Our model and baselines report moderate $\text{BEV~AP}$ and $\text{3D~AP}$ of the car category at $\text{IoU = 0.7}$.
-                We also evaluate on $\text{Closed GAP}$ with $\text{APs}$ of target and source. L.D. stands for LiDAR Distillation. 
-                Note that we highlight the best in bold for visibility.
-            </center>
+            $\text{minADE}_{20}/\text{minFDE}_{20}$ result of HighGraph. 
+            Our method noticeably improves the previous state-of-the-art methods in both datasets, 
+            demonstrating the importance of higher-order relation reasoning. 
+            The third rows in each baseline are the relative improvements in percentage. 
+            The performance improvement achieved by our proposed method is indicated in $\textbf{bold}$.
         </p>
             <!-- <div class="grid-image">
                 <img alt="" src="" />
@@ -141,17 +172,26 @@
                 -
             </center>
         </p> -->
+    </br>
+        <h2 class="section-subtitle">Qualitative Analysis</h2>
+        <h3 class="section-subtitle">Single-agent General Prediction</h3>
         <div class="center-img">
-            <img class="content" src="./image/iccv_tsne.png" >
+            <img class="content" src="./image/qualitative-1.png" >
         </div>
 
         <p style="margin-top: 30px;">
-            <center>
-                t-SNE visualization of source (red) and target (blue) domains' features. 
-                S and T stand for source and target, respectively. 
-                We discover that our Cross-Domain Discriminator suitably overcomes the domain shift effect between two domains. 
-                Best viewed in color.
-            </center>
+            Visualization of the qualitative influence of HighGraph. 
+            We illustrate the result of each subset of the ETH/UCY dataset, comparing the original model and the HighGraph-plugged model. 
+            Best viewed in color.
+        </p>
+    </br>
+        <h3 class="section-subtitle">Multi-agent Higher-order Prediction</h3>
+        <div class="center-img">
+            <img class="content" src="./image/highscene2-1.png" >
+        </div>
+        <p style="margin-top: 30px;">
+            Visualization of how HighGraph can improve the predictions in higher-order social scenarios. 
+            The scenes are selected from ETH/UCY subsets. Best viewed in color.
         </p>
 </div>
 </body>
